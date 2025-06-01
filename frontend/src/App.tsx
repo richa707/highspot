@@ -2,10 +2,16 @@ import { useState, useEffect } from 'react';
 import ProductList from '../../frontend/src/components/ProductList';
 import AddProductForm from '../../frontend/src/components/AddProductForm';
 import './App.css';
-import { fetchProducts } from '../../frontend/src/api';
+import { fetchProducts, addProduct, updateProductQuantity } from '../../frontend/src/api';
+
+interface Product {
+  id: string;
+  name: string;
+  quantity: number;
+}
 
 function App() {
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -21,14 +27,24 @@ function App() {
       });
   }, []);
 
-  const handleProductAdded = (newProduct: any) => {
-    // TODO: Implement
-    console.log('Product added:', newProduct);
+  const handleProductAdded = async (newProduct: { name: string; quantity: number }) => {
+    try {
+      const created = await addProduct(newProduct);
+      setProducts((prev) => [...prev, created]);
+    } catch (err: any) {
+      setError(err.message || 'Failed to add product');
+    }
   };
 
-  const handleQuantityUpdated = (productId: string, newQuantity: number) => {
-    // TODO: Implement
-    console.log('Quantity updated for:', productId, 'to', newQuantity);
+  const handleQuantityUpdated = async (productId: string, newQuantity: number) => {
+    try {
+      const updated = await updateProductQuantity(productId, newQuantity);
+      setProducts((prev) =>
+        prev.map((p) => (p.id === productId ? { ...p, quantity: updated.quantity } : p))
+      );
+    } catch (err: any) {
+      setError(err.message || 'Failed to update quantity');
+    }
   };
 
   if (loading) {

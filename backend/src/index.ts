@@ -21,12 +21,41 @@ app.get('/api/products', (req: Request, res: Response) => {
 
 // POST /api/products (will be implemented by the candidate)
 app.post('/api/products', (req: Request, res: Response) => {
-  // TODO: Implementation needed
+  const { name, quantity } = req.body;
+
+  // Basic validation: name must be a non-empty string, quantity must be a positive number
+  if (
+    typeof name !== 'string' ||
+    name.trim() === '' ||
+    typeof quantity !== 'number' ||
+    !Number.isFinite(quantity) ||
+    quantity <= 0
+  ) {
+    return res.status(400).json({ error: 'Invalid product data: name must be non-empty and quantity must be a positive number.' });
+  }
+
+  const id = String(nextId++);
+  const newProduct = { id, name, quantity };
+  products[id] = newProduct;
+
+  res.status(201).json(newProduct);
 });
 
 // PUT /api/products/:id (will be implemented by the candidate)
 app.put('/api/products/:id', (req: Request, res: Response) => {
-  // TODO: Implementation needed
+  const { id } = req.params;
+  const { quantity } = req.body;
+
+  if (!products[id]) {
+    return res.status(404).json({ error: 'Product not found' });
+  }
+
+  if (typeof quantity !== 'number') {
+    return res.status(400).json({ error: 'Invalid quantity' });
+  }
+
+  products[id].quantity = quantity;
+  res.json(products[id]);
 });
 
 app.listen(port, () => {

@@ -10,12 +10,18 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onProductAdded }) => {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (name && typeof quantity === 'number') {
-      onProductAdded({ name, quantity });
+    // Ensure name is not empty and quantity is a valid positive number
+    if (
+      name.trim() &&
+      typeof quantity === 'number' &&
+      !isNaN(quantity) &&
+      quantity > 0
+    ) {
+      onProductAdded({ name: name.trim(), quantity });
       setName('');
       setQuantity('');
     } else {
-      alert('Please enter a name and quantity.');
+      alert('Please enter a name and a positive quantity.');
     }
   };
 
@@ -30,6 +36,7 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onProductAdded }) => {
             id="name"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            required
           />
         </div>
         <div>
@@ -37,11 +44,27 @@ const AddProductForm: React.FC<AddProductFormProps> = ({ onProductAdded }) => {
           <input
             type="number"
             id="quantity"
+            min="1"
             value={quantity}
-            onChange={(e) => setQuantity(Number(e.target.value))}
+            onChange={(e) => {
+              const value = e.target.value;
+              setQuantity(value === '' ? '' : Number(value));
+            }}
+            required
           />
         </div>
-        <button type="submit">Add Product</button>
+        <button
+          type="submit"
+          disabled={
+            !name.trim() ||
+            quantity === '' ||
+            typeof quantity !== 'number' ||
+            isNaN(quantity) ||
+            quantity <= 0
+          }
+        >
+          Add Product
+        </button>
       </form>
     </div>
   );
