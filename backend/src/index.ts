@@ -46,20 +46,17 @@ app.put('/api/products/:id', (req: Request, res: Response) => {
   const { id } = req.params;
   const { quantity } = req.body;
 
-  if (!products[id]) {
+  if (typeof quantity !== 'number' || quantity < 0) {
+    return res.status(400).json({ error: 'Invalid product data: name must be non-empty and quantity must be a positive number.' });
+  }
+
+  const product = products[id];
+  if (!product) {
     return res.status(404).json({ error: 'Product not found' });
   }
 
-  if (typeof quantity !== 'number') {
-    return res.status(400).json({ error: 'Invalid quantity' });
-  }
-
-  products[id].quantity = quantity;
-  res.json(products[id]);
-});
-
-app.listen(port, () => {
-  console.log(`Backend server running on http://localhost:${port}`);
+  product.quantity = quantity;
+  res.json(product);
 });
 
 
