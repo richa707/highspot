@@ -62,3 +62,7 @@ app.put('/api/products/:id', (req: Request, res: Response) => {
 
 // Export the app for testing
 export default app;
+
+app.listen(port, () => {
+  console.log(`Backend server running on http://localhost:${port}`);
+});
